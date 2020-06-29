@@ -1,9 +1,0 @@
-version: '3'
-services:
-    emilia:
-        build: ./emilia
-        command: python main.py
-        ports: 
-            - "8000:8000"
-        environment: 
-            DB_PASSWORD: vYv-s3q-PP5-d5V
