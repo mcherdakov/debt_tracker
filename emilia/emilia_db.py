@@ -1,5 +1,4 @@
 from pymongo import MongoClient
-from bson.objectid import ObjectId
 from settings import config
 
 
@@ -11,18 +10,36 @@ class EmiliaDB:
         )
         self.db = self.client.emilia
         self.users = self.db.users
-
-    def get_users(self):
-        return list(self.users.find())
-
-    def get_user_by_id(self, uid):
-        return self.users.find_one({'_id': ObjectId(uid)})
+        self.debt = self.db.debt
+        self.transactions = self.db.transactions
 
     def get_user_by_username(self, username):
         return self.users.find_one({'username': username})
 
-    def get_debt(self, id):
-        pass
+    def get_debt(self, user1, user2):
+        """
+        returns: reverse, debt_object
+            reverse: if True, debt object is from user2 to user1
+        """
+        debt_user1 = self.debt.find_one({
+            'from': user1,
+            'to': user2,
+        })
+        debt_user2 = self.debt.find_one({
+            'from': user2,
+            'to': user1,
+        })
+
+        if debt_user1 is None and debt_user2 is None:
+            raise Exception('Debt object not found')
+
+        if debt_user1 is not None and debt_user2 is not None:
+            raise Exception('Multiple debt objects')
+
+        if debt_user1 is not None:
+            return False, debt_user1
+        else:
+            return True, debt_user2
 
 
 db = EmiliaDB(
