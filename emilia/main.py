@@ -2,6 +2,7 @@ from aiohttp import web
 from handlers import (
     debt_handler, transactions_handler, add_transaction_handler,
 )
+from settings import config
 
 app = web.Application()
 app.add_routes([
@@ -11,4 +12,4 @@ app.add_routes([
 ])
 
 if __name__ == '__main__':
-    web.run_app(app)
+    web.run_app(app, port=config.PORT)
