@@ -6,4 +6,4 @@ services:
         ports: 
             - "8000:8000"
         environment: 
-            DB_PASSWORD: vYv-s3q-PP5-d5V
+            DB_PASSWORD: password
