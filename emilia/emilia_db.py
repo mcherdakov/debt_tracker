@@ -9,12 +9,8 @@ class EmiliaDB:
             '?retryWrites=true&w=majority'
         )
         self.db = self.client.emilia
-        self.users = self.db.users
         self.debt = self.db.debt
         self.transactions = self.db.transactions
-
-    def get_user_by_username(self, username):
-        return self.users.find_one({'username': username})
 
     def get_debt(self, user1, user2):
         """
@@ -40,6 +36,20 @@ class EmiliaDB:
             return False, debt_user1
         else:
             return True, debt_user2
+
+    def get_transactions(self, username):
+        return list(
+            self.transactions.find({
+                '$or': [
+                    {
+                        'from': username,
+                    },
+                    {
+                        'to': username
+                    },
+                ]
+            })
+        )
 
 
 db = EmiliaDB(

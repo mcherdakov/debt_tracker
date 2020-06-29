@@ -2,7 +2,7 @@ import json
 from aiohttp import web
 from http import HTTPStatus
 from emilia_db import db
-from serializers import DebtSerializer
+from serializers import DebtSerializer, TransactionSerializer
 
 
 async def debt_handler(request):
@@ -22,4 +22,13 @@ async def debt_handler(request):
         )
 
     response = DebtSerializer(reverse, debt).serialize()
+    return web.Response(text=response)
+
+
+async def transactions_handler(request):
+    username = request.query.get('username')
+
+    transactions = db.get_transactions(username)
+    response = TransactionSerializer(transactions, many=True).serialize()
+
     return web.Response(text=response)
