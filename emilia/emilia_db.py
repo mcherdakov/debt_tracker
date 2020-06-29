@@ -51,6 +51,31 @@ class EmiliaDB:
             })
         )
 
+    def add_transaction(self, user_from, user_to, amount, message):
+        # TODO atomic transaction
+        reverse, debt_object = self.get_debt(user_from, user_to)
+        new_amount = -amount if reverse else amount
+
+        self.debt.update_one(
+            {
+                '_id': debt_object.get('_id')
+            },
+            {
+                '$set': {
+                    'amount': debt_object.get('amount') + new_amount,
+                }
+            }
+        )
+
+        db.transactions.insert_one(
+            {
+                'from': user_from,
+                'to': user_to,
+                'amount': amount,
+                'message': message,
+            }
+        )
+
 
 db = EmiliaDB(
     host=config.DB_HOST,

@@ -32,3 +32,30 @@ async def transactions_handler(request):
     response = TransactionSerializer(transactions, many=True).serialize()
 
     return web.Response(text=response)
+
+
+async def add_transaction_handler(request):
+    body = await request.json()
+    try:
+        db.add_transaction(
+            user_from=body.get('from'),
+            user_to=body.get('to'),
+            amount=float(body.get('amount')),
+            message=body.get('message'),
+        )
+    except ValueError:
+        return web.Response(
+            text=json.dumps(
+                {
+                    'message': 'Incorrect amount param',
+                },
+            ),
+            status=HTTPStatus.BAD_REQUEST,
+        )
+
+    response_object = {
+        'message': 'Transaction created successfully',
+    }
+    return web.Response(
+        text=json.dumps(response_object),
+    )
