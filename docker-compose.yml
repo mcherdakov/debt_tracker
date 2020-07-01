@@ -6,4 +6,12 @@ services:
         ports: 
             - "8000:8000"
         environment: 
-            DB_PASSWORD: password
+            DB_PASSWORD: password 
+    beatrice:
+        build: ./beatrice
+        command: python main.py
+        environment:
+            TG_TOKEN: token
+        network_mode: host
+        depends_on:
+            - emilia
