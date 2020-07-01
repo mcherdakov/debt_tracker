@@ -10,16 +10,39 @@ class BaseSerializer:
 
 
 class DebtSerializer(BaseSerializer):
-    def __init__(self, reverse, debt_object):
-        self.reverse = reverse
-        self.debt_object = debt_object
+    def __init__(self, username, debts, many=False):
+        # username for correct sign
+        self.debts = debts
+        self.username = username
+        self.many = many
+
+    def serialize_one(self, debt):
+        amount = debt.get('amount')
+        if debt.get('from') == self.username:
+            debt_to = debt.get('to')
+        else:
+            debt_to = debt.get('from')
+            amount = -amount
+
+        return {
+            'amount': amount,
+            'to': debt_to,
+        }
 
     def serialize(self):
-        amount = self.debt_object.get('amount')
-        return json.dumps({
-            'amount':
-                -amount if self.reverse else amount
-        })
+        if not self.many:
+            return json.dumps(self.serialize_one(
+                self.debts
+            ))
+
+        return json.dumps(
+            {
+                'debts': [
+                    self.serialize_one(debt)
+                    for debt in self.debts
+                ],
+            }
+        )
 
 
 class TransactionSerializer(BaseSerializer):

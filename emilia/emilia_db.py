@@ -37,6 +37,20 @@ class EmiliaDB:
         else:
             return True, debt_user2
 
+    def get_user_debts(self, username):
+        return list(
+            self.debt.find({
+                '$or': [
+                    {
+                        'from': username,
+                    },
+                    {
+                        'to': username,
+                    }
+                ]
+            })
+        )
+
     def get_transactions(self, username):
         return list(
             self.transactions.find({
@@ -45,7 +59,7 @@ class EmiliaDB:
                         'from': username,
                     },
                     {
-                        'to': username
+                        'to': username,
                     },
                 ]
             })

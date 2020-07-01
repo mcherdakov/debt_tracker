@@ -5,12 +5,14 @@ from emilia_db import db
 from serializers import DebtSerializer, TransactionSerializer
 
 
+CTYPE = 'application/json'
+
+
 async def debt_handler(request):
-    user_from = request.query.get('from')
-    user_to = request.query.get('to')
+    username = request.query.get('username')
 
     try:
-        reverse, debt = db.get_debt(user_from, user_to)
+        debts = db.get_user_debts(username)
     except Exception as e:
         return web.Response(
             text=json.dumps(
@@ -19,10 +21,14 @@ async def debt_handler(request):
                 }
             ),
             status=HTTPStatus.BAD_REQUEST,
+            content_type=CTYPE,
         )
 
-    response = DebtSerializer(reverse, debt).serialize()
-    return web.Response(text=response)
+    response = DebtSerializer(username, debts, many=True).serialize()
+    return web.Response(
+        text=response,
+        content_type=CTYPE,
+    )
 
 
 async def transactions_handler(request):
@@ -31,7 +37,10 @@ async def transactions_handler(request):
     transactions = db.get_transactions(username)
     response = TransactionSerializer(transactions, many=True).serialize()
 
-    return web.Response(text=response)
+    return web.Response(
+        text=response,
+        content_type=CTYPE,
+    )
 
 
 async def add_transaction_handler(request):
@@ -51,6 +60,7 @@ async def add_transaction_handler(request):
                 },
             ),
             status=HTTPStatus.BAD_REQUEST,
+            content_type=CTYPE,
         )
 
     response_object = {
@@ -58,4 +68,5 @@ async def add_transaction_handler(request):
     }
     return web.Response(
         text=json.dumps(response_object),
+        content_type=CTYPE,
     )
